@@ -1,6 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../Models/user");
 const { protect } = require("../middleware/auth");
 
 const router = express.Router();
@@ -9,7 +9,7 @@ const router = express.Router();
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-// ─── POST /api/auth/register ───────────────────────────────
+// POST /api/auth/register
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -41,7 +41,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ─── POST /api/auth/login ──────────────────────────────────
+// POST /api/auth/login
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ─── GET /api/auth/me ──────────────────────────────────────
+// GET /api/auth/me 
 router.get("/me", protect, async (req, res) => {
   try {
     res.json({
