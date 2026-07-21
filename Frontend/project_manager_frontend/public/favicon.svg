@@ -1,29 +1,9 @@
-<svg xmlns="http://w3.org" viewBox="0 0 512 512" width="100%" height="100%">
-  <!-- Solid Black Canvas Background for Perfect Index.html Integration -->
-  <rect width="512" height="512" fill="#000000" />
-
-  <!-- Smooth Rounded Squircle Icon Base (Deep Blue-Black / Charcoal) -->
-  <rect x="64" y="64" width="384" height="384" rx="96" fill="#0A0F1D" />
-
-  <!-- Progress Layout Elements (Burnt Orange Variant A) -->
-  <g>
-    <!-- Top Progress Bar -->
-    <rect x="130" y="150" width="190" height="46" rx="23" fill="#CC5500" />
-    
-    <!-- Middle Extended Progress Bar -->
-    <rect x="170" y="233" width="212" height="46" rx="23" fill="#B34A00" />
-    
-    <!-- Bottom Base Progress Bar -->
-    <rect x="130" y="316" width="160" height="46" rx="23" fill="#993F00" />
-  </g>
-
-  <!-- Complete Checkmark Status Badge (Burnt Orange) -->
-  <g>
-    <!-- Badge Outline Circle Layer for Contrast Depth -->
-    <circle cx="340" cy="160" r="48" fill="#0A0F1D" />
-    <!-- Main Burnt Orange Status Circle -->
-    <circle cx="340" cy="160" r="40" fill="#E65F00" />
-    <!-- Pure White Checkmark Graphics Asset -->
-    <path d="M318 160 L332 174 L362 144" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect x="0" y="0" width="200" height="200" rx="36" fill="#12141C"/>
+  <rect x="35" y="25" width="130" height="155" rx="10" fill="#2C3244"/>
+  <rect x="75" y="18" width="50" height="20" rx="8" fill="#F0883E"/>
+  <path d="M 55 75 L 68 88 L 90 60" fill="none" stroke="#F0883E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="100" y="68" width="45" height="10" rx="5" fill="#3A4256"/>
+  <path d="M 55 115 L 68 128 L 90 100" fill="none" stroke="#F0883E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="100" y="108" width="45" height="10" rx="5" fill="#3A4256"/>
 </svg>
