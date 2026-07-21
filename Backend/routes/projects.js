@@ -1,5 +1,6 @@
 const express = require("express");
 const Project = require("../Models/project");
+const User = require("../Models/user");
 const Task = require("../Models/task");
 const { protect } = require("../middleware/auth");
 
@@ -14,7 +15,8 @@ router.get("/", async (req, res) => {
   try {
     const projects = await Project.find({
       $or: [{ owner: req.user._id }, { "members.user": req.user._id }],
-    }).populate("owner", "name email avatar");
+    }) .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar")
 
     res.json({ success: true, count: projects.length, data: projects });
   } catch (error) {
@@ -128,15 +130,29 @@ router.post("/:id/members", async (req, res) => {
       return res.status(403).json({ success: false, message: "Only the owner can add members" });
     }
 
-    const { userId, role } = req.body;
+    const { email, role } = req.body;
 
-    const alreadyMember = project.members.some((m) => m.user.equals(userId));
+    if (!["member", "viewer"].includes(role)) {
+      return res.status(400).json({ success: false, message: "Role must be 'member' or 'viewer'" });
+    }
+
+    const userToAdd = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!userToAdd) {
+      return res.status(404).json({ success: false, message: "No user found with that email" });
+    }
+
+    if (project.owner.equals(userToAdd._id)) {
+      return res.status(409).json({ success: false, message: "This user is already the project owner" });
+    }
+
+    const alreadyMember = project.members.some((m) => m.user.equals(userToAdd._id));
     if (alreadyMember) {
       return res.status(409).json({ success: false, message: "User is already a member" });
     }
 
-    project.members.push({ user: userId, role: role || "member" });
+    project.members.push({ user: userToAdd._id, role });
     await project.save();
+    await project.populate("members.user", "name email avatar");
 
     res.json({ success: true, data: project });
   } catch (error) {

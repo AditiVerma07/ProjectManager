@@ -65,6 +65,12 @@ router.post("/", async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized to add tasks to this project" });
     }
 
+    // Check if the user has permission to create tasks based on their role in the project
+    const role = projectDoc.getMemberRole(req.user._id);
+    if (role === "viewer") {
+      return res.status(403).json({ success: false, message: "Viewers cannot create tasks" });
+    } 
+
     const task = await Task.create({
       title, description, project, assignees, status,
       priority, dueDate, estimatedHours, tags, parentTask,
@@ -119,6 +125,11 @@ router.put("/:id", async (req, res) => {
     const project = await Project.findById(task.project);
     if (!project || !project.isMember(req.user._id)) {
       return res.status(403).json({ success: false, message: "Not authorized to update this task" });
+    }
+    // Check if the user has permission to update tasks based on their role in the project
+    const role = project.getMemberRole(req.user._id);
+    if (role === "viewer") {
+      return res.status(403).json({ success: false, message: "Viewers cannot update tasks" });
     }
 
     // ✅ FIXED: Safely loop and update ONLY fields that are actually sent in the request body

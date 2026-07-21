@@ -4,11 +4,13 @@ import { get, post, put, del } from '../api/client'
 import TaskTable from '../components/tasks/TaskTable'
 import KanbanBoard from '../components/tasks/KanbanBoard'
 import { toast } from 'sonner'
+import { useAuth } from '../hooks/useAuth'
 
 export default function TasksPage() {
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('project')
   const projectName = searchParams.get('name')
+  const { user } = useAuth()
 
   const [tasks, setTasks] = useState([])
   const [projects, setProjects] = useState([]) 
@@ -24,6 +26,10 @@ export default function TasksPage() {
   const [status, setStatus] = useState('todo')
   const [dueDate, setDueDate] = useState('')
   const [selectedProjectId, setSelectedProjectId] = useState('')
+
+  // NEW: track the current user's role on the open project
+  const [currentRole, setCurrentRole] = useState(null)
+  const isViewer = projectId ? currentRole === 'viewer' : false
 
   useEffect(() => {
     const url = projectId ? `/tasks?project=${projectId}` : '/tasks'
@@ -44,6 +50,32 @@ export default function TasksPage() {
       })
       .catch(err => console.error('Failed to load projects list:', err.message))
   }, [projectId])
+
+  // NEW: fetch role on the specific project, if we're viewing one
+  useEffect(() => {
+  if (!projectId || !user) return
+
+  let ignore = false
+
+  get(`/projects/${projectId}`)
+    .then(res => {
+      if (ignore) return
+      const project = res.data
+     if (project.owner._id === user._id || project.owner === user._id) {
+  setCurrentRole('owner')
+} else {
+  const member = project.members.find(m => (m.user._id || m.user) === user._id)
+  setCurrentRole(member ? member.role : null)
+}
+    })
+    .catch(err => console.error('Failed to load project role:', err.message))
+
+  return () => {
+    ignore = true
+    setCurrentRole(null)
+  }
+}, [projectId, user])
+
 
   function openCreate() {
     setEditTask(null)
@@ -124,6 +156,10 @@ export default function TasksPage() {
   }
 
   async function handleStatusChange(taskId, newStatus) {
+    if (isViewer) {
+      toast.error('Viewers cannot move tasks')
+      return
+    }
     try {
       await put(`/tasks/${taskId}`, { status: newStatus })
       setTasks(prev => prev.map(t => t._id === taskId ? { ...t, status: newStatus } : t))
@@ -145,7 +181,10 @@ export default function TasksPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 600, color: '#F4F4F6' }}>{projectName || 'All My Tasks'}</h1>
-          <p style={{ color: '#B4B9C6', fontSize: 13, marginTop: 2 }}>{tasks.length} task{tasks.length !== 1 ? 's' : ''}</p>
+          <p style={{ color: '#B4B9C6', fontSize: 13, marginTop: 2 }}>
+            {tasks.length} task{tasks.length !== 1 ? 's' : ''}
+            {isViewer && <span style={{ marginLeft: 8, color: '#FBBF24' }}>· View only</span>}
+          </p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <div style={{ display: 'flex', border: '1px solid #2C3244', borderRadius: 8, overflow: 'hidden' }}>
@@ -157,7 +196,8 @@ export default function TasksPage() {
             </button>
           </div>
           
-          {(projectId || projects.length > 0) && (
+          {/* CHANGED: hide New Task button for viewers */}
+          {(projectId || projects.length > 0) && !isViewer && (
             <button onClick={openCreate} style={{ padding: '9px 16px', background: '#F0883E', color: '#12141C', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 500 }}>
               + New Task
             </button>
@@ -172,10 +212,11 @@ export default function TasksPage() {
         </div>
       ) : view === 'table' ? (
         <div style={{ background: '#1B1F2B', border: '1px solid #2C3244', borderRadius: 10, overflow: 'hidden' }}>
-          <TaskTable tasks={tasks} onEdit={openEdit} onDelete={handleDelete} />
+          {/* CHANGED: pass readOnly down */}
+          <TaskTable tasks={tasks} onEdit={openEdit} onDelete={handleDelete} readOnly={isViewer} />
         </div>
       ) : (
-        <KanbanBoard tasks={tasks} onEdit={openEdit} onDelete={handleDelete} onStatusChange={handleStatusChange} />
+        <KanbanBoard tasks={tasks} onEdit={openEdit} onDelete={handleDelete} onStatusChange={handleStatusChange} readOnly={isViewer} />
       )}
 
       {showModal && (

@@ -2,8 +2,6 @@ import { useState, useRef, useEffect } from 'react'
 import { post } from '../api/client'
 import { toast } from 'sonner'
 
-// Parses task suggestion from AI response
-// Parses task suggestion from AI response and normalizes values
 function parseTaskSuggestion(text) {
   if (!text.includes('---TASK SUGGESTION---')) return null
 
@@ -15,18 +13,15 @@ function parseTaskSuggestion(text) {
     return line ? line.replace(key + ':', '').trim() : ''
   }
 
-  // Get raw values from AI string
   const rawStatus = get('Status').toLowerCase()
   const rawPriority = get('Priority').toLowerCase()
 
-  // Map AI outputs to your exact database enum variations
-  let validatedStatus = 'todo' // Default fallback
+  let validatedStatus = 'todo'
   if (rawStatus.includes('progress') || rawStatus === 'in_progress') validatedStatus = 'in_progress'
   if (rawStatus.includes('backlog')) validatedStatus = 'backlog'
   if (rawStatus === 'todo') validatedStatus = 'todo'
 
-  // Map AI priorities to match database expectations
-  let validatedPriority = 'medium' // Default fallback
+  let validatedPriority = 'medium'
   if (rawPriority.includes('low')) validatedPriority = 'low'
   if (rawPriority.includes('med')) validatedPriority = 'medium'
   if (rawPriority.includes('high')) validatedPriority = 'high'
@@ -41,8 +36,6 @@ function parseTaskSuggestion(text) {
   }
 }
 
-
-// Cleans the task suggestion block from the visible message
 function cleanMessage(text) {
   return text.split('---TASK SUGGESTION---')[0].trim()
 }
@@ -70,58 +63,53 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
     setLoading(true)
 
     try {
-      // Only send role + content to backend, skip the first assistant greeting
       const toSend = updatedMessages.slice(1).map(m => ({ role: m.role, content: m.content }))
       const res = await post('/chat', { messages: toSend })
       setMessages([...updatedMessages, { role: 'assistant', content: res.reply }])
     } catch (err) {
       toast.error(err.message)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
     <>
-      {/* Overlay */}
       {isOpen && (
         <div
           onClick={onClose}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.2)', zIndex: 150 }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 150 }}
         />
       )}
 
-      {/* Panel */}
       <div style={{
         position: 'fixed',
         top: 0,
         right: isOpen ? 0 : -420,
         width: 400,
         height: '100vh',
-        background: 'white',
-        borderLeft: '1px solid #e5e5e5',
+        background: '#1B1F2B',
+        borderLeft: '1px solid #2C3244',
         zIndex: 200,
         display: 'flex',
         flexDirection: 'column',
         transition: 'right 0.3s ease',
-        boxShadow: isOpen ? '-4px 0 20px rgba(0,0,0,0.08)' : 'none'
+        boxShadow: isOpen ? '-4px 0 20px rgba(0,0,0,0.3)' : 'none'
       }}>
 
-        {/* Header */}
-        <div style={{ padding: '18px 20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '18px 20px', borderBottom: '1px solid #2C3244', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: 16, fontWeight: 600 }}>AI Assistant</h2>
-            <p style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>Powered by Groq</p>
+            <h2 style={{ fontSize: 16, fontWeight: 600, color: '#F4F4F6' }}>AI Assistant</h2>
+            <p style={{ fontSize: 12, color: '#7C8296', marginTop: 2 }}>Powered by Groq</p>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', fontSize: 18, color: '#aaa', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', fontSize: 18, color: '#7C8296', cursor: 'pointer' }}
           >
             ✕
           </button>
         </div>
 
-        {/* Messages */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {messages.map((msg, i) => {
             const isUser = msg.role === 'user'
@@ -134,8 +122,8 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
                   maxWidth: '85%',
                   padding: '10px 14px',
                   borderRadius: isUser ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
-                  background: isUser ? '#4f7c5f' : '#f5f5f0',
-                  color: isUser ? 'white' : '#1a1a1a',
+                  background: isUser ? '#F0883E' : '#242A3A',
+                  color: isUser ? '#12141C' : '#F4F4F6',
                   fontSize: 13.5,
                   lineHeight: 1.6,
                   whiteSpace: 'pre-wrap'
@@ -143,21 +131,20 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
                   {displayText}
                 </div>
 
-                {/* Task suggestion card */}
                 {suggestion && suggestion.title && (
                   <div style={{
                     marginTop: 8,
                     padding: '12px 14px',
-                    background: '#eef3f0',
-                    border: '1px solid #c8ddd1',
+                    background: 'rgba(240, 136, 62, 0.1)',
+                    border: '1px solid rgba(240, 136, 62, 0.3)',
                     borderRadius: 10,
                     maxWidth: '85%',
                     width: '100%'
                   }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#4f7c5f', marginBottom: 8 }}>📋 Suggested Task</p>
-                    <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>{suggestion.title}</p>
-                    {suggestion.description && <p style={{ fontSize: 12, color: '#666', marginBottom: 6 }}>{suggestion.description}</p>}
-                    <div style={{ display: 'flex', gap: 8, fontSize: 12, color: '#888', marginBottom: 10 }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#F0883E', marginBottom: 8 }}>📋 Suggested Task</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 4, color: '#F4F4F6' }}>{suggestion.title}</p>
+                    {suggestion.description && <p style={{ fontSize: 12, color: '#B4B9C6', marginBottom: 6 }}>{suggestion.description}</p>}
+                    <div style={{ display: 'flex', gap: 8, fontSize: 12, color: '#7C8296', marginBottom: 10 }}>
                       <span>Priority: {suggestion.priority}</span>
                       <span>·</span>
                       <span>Due: {suggestion.dueDate}</span>
@@ -166,8 +153,8 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
                       onClick={() => onUseTask(suggestion)}
                       style={{
                         padding: '7px 14px',
-                        background: '#4f7c5f',
-                        color: 'white',
+                        background: '#F0883E',
+                        color: '#12141C',
                         border: 'none',
                         borderRadius: 8,
                         fontSize: 12,
@@ -186,7 +173,7 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
 
           {loading && (
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-              <div style={{ padding: '10px 14px', background: '#f5f5f0', borderRadius: '12px 12px 12px 4px', fontSize: 13, color: '#aaa' }}>
+              <div style={{ padding: '10px 14px', background: '#242A3A', borderRadius: '12px 12px 12px 4px', fontSize: 13, color: '#7C8296' }}>
                 Thinking...
               </div>
             </div>
@@ -195,8 +182,7 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input */}
-        <form onSubmit={sendMessage} style={{ padding: '14px 20px', borderTop: '1px solid #eee', display: 'flex', gap: 10 }}>
+        <form onSubmit={sendMessage} style={{ padding: '14px 20px', borderTop: '1px solid #2C3244', display: 'flex', gap: 10 }}>
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -205,11 +191,12 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
             style={{
               flex: 1,
               padding: '10px 12px',
-              border: '1px solid #ddd',
+              border: '1px solid #2C3244',
               borderRadius: 8,
               fontSize: 13,
               outline: 'none',
-              background: '#fafafa'
+              background: '#12141C',
+              color: '#F4F4F6'
             }}
           />
           <button
@@ -217,8 +204,8 @@ export default function ChatPanel({ isOpen, onClose, onUseTask }) {
             disabled={loading || !input.trim()}
             style={{
               padding: '10px 16px',
-              background: loading || !input.trim() ? '#ccc' : '#4f7c5f',
-              color: 'white',
+              background: loading || !input.trim() ? '#3A4256' : '#F0883E',
+              color: loading || !input.trim() ? '#7C8296' : '#12141C',
               border: 'none',
               borderRadius: 8,
               fontSize: 13,
