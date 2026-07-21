@@ -6,7 +6,7 @@ const titles = {
   '/tasks': { title: 'My Tasks', sub: 'Tasks assigned to you' },
 };
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const location = useLocation();
   const current = titles[location.pathname] || { title: 'Planify', sub: '' };
 
@@ -23,6 +23,24 @@ export default function Header() {
       zIndex: 50,
       gap: 12,
     }}>
+      <button
+        className="sidebar-toggle-btn"
+        onClick={onMenuClick}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: 'var(--text-primary)',
+          fontSize: 20,
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 0,
+          marginRight: 4
+        }}
+        aria-label="Toggle menu"
+      >
+        ☰
+      </button>
+
       <div>
         <h1 style={{
           fontFamily: 'var(--font-display)',

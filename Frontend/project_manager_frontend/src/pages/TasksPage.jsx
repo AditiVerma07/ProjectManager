@@ -18,7 +18,6 @@ export default function TasksPage() {
   const [editTask, setEditTask] = useState(null)
   const [saving, setSaving] = useState(false)
 
-  // form state
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState('medium')
@@ -26,7 +25,6 @@ export default function TasksPage() {
   const [dueDate, setDueDate] = useState('')
   const [selectedProjectId, setSelectedProjectId] = useState('')
 
-  // Fetch tasks based on context
   useEffect(() => {
     const url = projectId ? `/tasks?project=${projectId}` : '/tasks'
     get(url)
@@ -35,7 +33,6 @@ export default function TasksPage() {
       .finally(() => setLoading(false))
   }, [projectId])
 
-  // Fetch available projects to populate the creation dropdown list
   useEffect(() => {
     get('/projects')
       .then(res => {
@@ -48,8 +45,6 @@ export default function TasksPage() {
       .catch(err => console.error('Failed to load projects list:', err.message))
   }, [projectId])
 
-
-  
   function openCreate() {
     setEditTask(null)
     setTitle(''); setDescription(''); setPriority('medium'); setStatus('todo'); setDueDate('')
@@ -69,23 +64,23 @@ export default function TasksPage() {
   }
 
   function openFromChat(task) {
-  setEditTask(null)
-  setTitle(task.title || '')
-  setDescription(task.description || '')
-  setPriority(task.priority || 'medium')
-  setStatus(task.status || 'todo')
-  setDueDate(task.dueDate || '')
-  setSelectedProjectId(projectId || (projects[0]?._id || ''))
-  setShowModal(true)
-}
-
-useEffect(() => {
-  function handleChatTask(e) {
-    openFromChat(e.detail)
+    setEditTask(null)
+    setTitle(task.title || '')
+    setDescription(task.description || '')
+    setPriority(task.priority || 'medium')
+    setStatus(task.status || 'todo')
+    setDueDate(task.dueDate || '')
+    setSelectedProjectId(projectId || (projects[0]?._id || ''))
+    setShowModal(true)
   }
-  window.addEventListener('use-chat-task', handleChatTask)
-  return () => window.removeEventListener('use-chat-task', handleChatTask)
-}, [projects, projectId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    function handleChatTask(e) {
+      openFromChat(e.detail)
+    }
+    window.addEventListener('use-chat-task', handleChatTask)
+    return () => window.removeEventListener('use-chat-task', handleChatTask)
+  }, [projects, projectId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleSave(e) {
     e.preventDefault()
@@ -106,7 +101,7 @@ useEffect(() => {
         toast.success('Task updated')
       } else {
         const res = await post('/tasks', { ...body, project: activeTargetProject })
-         const newTask = res.data || res;
+        const newTask = res.data || res;
         setTasks([newTask, ...tasks])
         toast.success('Task created')
       }
@@ -128,69 +123,65 @@ useEffect(() => {
     }
   }
 
-async function handleStatusChange(taskId, newStatus) {
-  try {
-    await put(`/tasks/${taskId}`, { status: newStatus })
-    setTasks(prev => prev.map(t => t._id === taskId ? { ...t, status: newStatus } : t))
-  } catch (err) {
-    toast.error(err.message || 'Failed to update task status')
+  async function handleStatusChange(taskId, newStatus) {
+    try {
+      await put(`/tasks/${taskId}`, { status: newStatus })
+      setTasks(prev => prev.map(t => t._id === taskId ? { ...t, status: newStatus } : t))
+    } catch (err) {
+      toast.error(err.message || 'Failed to update task status')
+    }
   }
-}
 
   if (loading) {
     return (
       <div style={{ textAlign: 'center', paddingTop: 80 }}>
-        <p style={{ color: '#aaa', fontSize: 14 }}>Loading tasks...</p>
+        <p style={{ color: '#7C8296', fontSize: 14 }}>Loading tasks...</p>
       </div>
     )
   }
 
   return (
     <div>
-      {/* Header Layout UI */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 600 }}>{projectName || 'All My Tasks'}</h1>
-          <p style={{ color: '#888', fontSize: 13, marginTop: 2 }}>{tasks.length} task{tasks.length !== 1 ? 's' : ''}</p>
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: '#F4F4F6' }}>{projectName || 'All My Tasks'}</h1>
+          <p style={{ color: '#B4B9C6', fontSize: 13, marginTop: 2 }}>{tasks.length} task{tasks.length !== 1 ? 's' : ''}</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          {/* Layout view configuration elements */}
-          <div style={{ display: 'flex', border: '1px solid #ddd', borderRadius: 8, overflow: 'hidden' }}>
-            <button onClick={() => setView('table')} style={{ padding: '7px 14px', border: 'none', cursor: 'pointer', fontSize: 13, background: view === 'table' ? '#4f7c5f' : 'white', color: view === 'table' ? 'white' : '#555' }}>
+          <div style={{ display: 'flex', border: '1px solid #2C3244', borderRadius: 8, overflow: 'hidden' }}>
+            <button onClick={() => setView('table')} style={{ padding: '7px 14px', border: 'none', cursor: 'pointer', fontSize: 13, background: view === 'table' ? '#F0883E' : '#1B1F2B', color: view === 'table' ? '#12141C' : '#B4B9C6' }}>
               Table
             </button>
-            <button onClick={() => setView('kanban')} style={{ padding: '7px 14px', border: 'none', cursor: 'pointer', fontSize: 13, background: view === 'kanban' ? '#4f7c5f' : 'white', color: view === 'kanban' ? 'white' : '#555' }}>
+            <button onClick={() => setView('kanban')} style={{ padding: '7px 14px', border: 'none', cursor: 'pointer', fontSize: 13, background: view === 'kanban' ? '#F0883E' : '#1B1F2B', color: view === 'kanban' ? '#12141C' : '#B4B9C6' }}>
               Kanban
             </button>
           </div>
           
           {(projectId || projects.length > 0) && (
-            <button onClick={openCreate} style={{ padding: '9px 16px', background: '#4f7c5f', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 500 }}>
+            <button onClick={openCreate} style={{ padding: '9px 16px', background: '#F0883E', color: '#12141C', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 500 }}>
               + New Task
             </button>
           )}
         </div>
       </div>
 
-      {/* Grid Content Wrapper */}
       {tasks.length === 0 ? (
         <div style={{ textAlign: 'center', paddingTop: 60 }}>
           <p style={{ fontSize: 16, marginBottom: 6 }}>📝</p>
-          <p style={{ color: '#aaa', fontSize: 14 }}>No active tasks found. Click "+ New Task" to begin logging work.</p>
+          <p style={{ color: '#7C8296', fontSize: 14 }}>No active tasks found. Click "+ New Task" to begin logging work.</p>
         </div>
       ) : view === 'table' ? (
-        <div style={{ background: 'white', border: '1px solid #e5e5e5', borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ background: '#1B1F2B', border: '1px solid #2C3244', borderRadius: 10, overflow: 'hidden' }}>
           <TaskTable tasks={tasks} onEdit={openEdit} onDelete={handleDelete} />
         </div>
       ) : (
         <KanbanBoard tasks={tasks} onEdit={openEdit} onDelete={handleDelete} onStatusChange={handleStatusChange} />
       )}
 
-      {/* Task Creation/Editing Management Modal */}
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ background: 'white', borderRadius: 12, padding: 28, width: 420, border: '1px solid #e5e5e5' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 20 }}>{editTask ? 'Edit Task' : 'New Task'}</h2>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div style={{ background: '#1B1F2B', borderRadius: 12, padding: 28, width: 420, border: '1px solid #2C3244' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 20, color: '#F4F4F6' }}>{editTask ? 'Edit Task' : 'New Task'}</h2>
             <form onSubmit={handleSave}>
               
               {!projectId && !editTask && (
@@ -250,7 +241,7 @@ async function handleStatusChange(taskId, newStatus) {
   )
 }
 
-const labelStyle = { display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#444' }
-const inputStyle = { width: '100%', padding: '9px 12px', border: '1px solid #ddd', borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box' }
-const btnStyle = { padding: '10px 16px', background: '#4f7c5f', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500 }
-const ghostBtnStyle = { padding: '10px 16px', background: 'none', color: '#555', border: '1px solid #ddd', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer' }
+const labelStyle = { display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#B4B9C6' }
+const inputStyle = { width: '100%', padding: '9px 12px', border: '1px solid #2C3244', borderRadius: 8, fontSize: 13, outline: 'none', background: '#12141C', color: '#F4F4F6', boxSizing: 'border-box' }
+const btnStyle = { padding: '10px 16px', background: '#F0883E', color: '#12141C', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 500 }
+const ghostBtnStyle = { padding: '10px 16px', background: 'transparent', color: '#B4B9C6', border: '1px solid #2C3244', borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: 'pointer' }

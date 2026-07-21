@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { toast } from 'sonner'
 
-// Static phrases for the typewriter animation loop
 const phrases = [
   'plan your entire day and manage all your team goals with absolute ease.', 
   'take control of your busy schedule and transform your daily ideas into achievements.', 
@@ -13,17 +12,15 @@ const phrases = [
 ]
 
 export default function RegisterPage() {
-  const { register } = useAuth() // Uses the register method from your AuthContext
+  const { register } = useAuth()
   const navigate = useNavigate()
   
-  // Form states (Added 'name' for registration)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [emailTouched, setEmailTouched] = useState(false)
 
-  // Typewriter states
   const [displayText, setDisplayText] = useState('')
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [charIndex, setCharIndex] = useState(0)
@@ -96,11 +93,10 @@ export default function RegisterPage() {
       flexDirection: 'column', 
       alignItems: 'center', 
       justifyContent: 'center', 
-      background: '#f5f5f0',
+      background: '#12141C',
       padding: '20px'
     }}>
       
-      {/* Brand Header */}
       <div style={{ 
         width: 400, 
         display: 'flex', 
@@ -115,17 +111,17 @@ export default function RegisterPage() {
           justifyContent: 'center', 
           width: 40, 
           height: 40, 
-          background: '#4f7c5f', 
+          background: '#F0883E', 
           borderRadius: 10,
-          boxShadow: '0 4px 12px rgba(79, 124, 95, 0.15)',
+          boxShadow: '0 4px 12px rgba(240, 136, 62, 0.25)',
           marginTop: 2 
         }}>
-          <span style={{ fontSize: 18, color: 'white' }}>📋</span>
+          <span style={{ fontSize: 18, color: '#12141C' }}>📋</span>
         </div>
         <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#2a4434', margin: 0, letterSpacing: '-0.02em' }}>Planify</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#F4F4F6', margin: 0, letterSpacing: '-0.02em' }}>Planify</h1>
           <p style={{ 
-            color: '#70706a', 
+            color: '#B4B9C6', 
             fontSize: 13.5, 
             margin: 0, 
             marginTop: 4, 
@@ -133,10 +129,10 @@ export default function RegisterPage() {
             minHeight: '40px' 
           }}>
             Hello! Welcome to your new clear workspace built to{' '}
-            <span style={{ color: '#385944', fontWeight: 500 }}>{displayText}</span>
+            <span style={{ color: '#FF9E5A', fontWeight: 500 }}>{displayText}</span>
             <span style={{ 
               fontWeight: 'bold', 
-              color: '#4f7c5f', 
+              color: '#F0883E', 
               animation: 'blink 1s step-end infinite',
               marginLeft: '2px'
             }}>|</span>
@@ -151,15 +147,13 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Registration Card Container */}
-      <div style={{ width: 400, background: 'white', borderRadius: 16, padding: 36, border: '1px solid #e5e5e5', boxShadow: '0 4px 18px rgba(0,0,0,0.02)', boxSizing: 'border-box' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, color: '#1a1a1a' }}>Get started</h2>
-        <p style={{ color: '#888', fontSize: 13, marginBottom: 24 }}>Create your free workspace account</p>
+      <div style={{ width: 400, background: '#1B1F2B', borderRadius: 16, padding: 36, border: '1px solid #2C3244', boxShadow: '0 4px 18px rgba(0,0,0,0.2)', boxSizing: 'border-box' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, color: '#F4F4F6' }}>Get started</h2>
+        <p style={{ color: '#B4B9C6', fontSize: 13, marginBottom: 24 }}>Create your free workspace account</p>
 
         <form onSubmit={handleSubmit} noValidate>
-          {/* Name Field */}
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#444' }}>Full Name</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#B4B9C6' }}>Full Name</label>
             <input
               type="text"
               value={name}
@@ -170,9 +164,8 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Email Field */}
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#444' }}>Email Address</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#B4B9C6' }}>Email Address</label>
             <input
               type="text"
               value={email}
@@ -182,19 +175,18 @@ export default function RegisterPage() {
               required
               style={{
                 ...inputStyle,
-                border: isEmailInvalid ? '1px solid #e05c5c' : '1px solid #ddd' 
+                border: isEmailInvalid ? '1px solid #F87171' : '1px solid #2C3244'
               }}
             />
             {isEmailInvalid && (
-              <p style={{ color: '#e05c5c', fontSize: 12, marginTop: 4 }}>
+              <p style={{ color: '#F87171', fontSize: 12, marginTop: 4 }}>
                 An '@' is required in the email address.
               </p>
             )}
           </div>
 
-          {/* Password Field */}
           <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#444' }}>Password</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#B4B9C6' }}>Password</label>
             <input
               type="password"
               value={password}
@@ -210,8 +202,8 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: '#888', marginBottom: 0 }}>
-          Already have an account? <Link to="/login" style={{ color: '#4f7c5f', fontWeight: 500 }}>Sign in</Link>
+        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: '#B4B9C6', marginBottom: 0 }}>
+          Already have an account? <Link to="/login" style={{ color: '#F0883E', fontWeight: 500 }}>Sign in</Link>
         </p>
       </div>
     </div>
@@ -224,15 +216,17 @@ const inputStyle = {
   borderRadius: 8,
   fontSize: 14,
   outline: 'none',
-  background: '#fafafa',
+  background: '#12141C',
+  color: '#F4F4F6',
+  border: '1px solid #2C3244',
   boxSizing: 'border-box'
 }
 
 const btnStyle = {
   width: '100%',
   padding: '11px',
-  background: '#4f7c5f',
-  color: 'white',
+  background: '#F0883E',
+  color: '#12141C',
   border: 'none',
   borderRadius: 8,
   fontSize: 14,
